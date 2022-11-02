@@ -44,10 +44,46 @@ class IndexViewWithTemplate(views.TemplateView):
 class IndexViewWithListView(views.ListView):
     model = Employee
     template_name = 'index.html'
+    # rename object_list to employees
     context_object_name = 'employees'
     extra_context = {
         'title': 'List view',
     }
+
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pattern = self.__get_pattern()
+        if pattern:
+            queryset = queryset.filter(first_name__icontains=pattern)
+        # queryset = queryset.order_by('first_name')
+
+        return queryset
+
+    def __get_pattern(self):
+        pattern = self.request.GET.get('pattern', None)
+        if pattern:
+            return pattern.lower()
+        return None
+
+
+class EmployeeDetailsView(views.DetailView):
+    # renames object ot employee
+    context_object_name = 'employee'
+    model = Employee
+    template_name = 'employees/details.html'
+
+
+class EmployeeCreateView(views.CreateView):
+    template_name = 'employees/create.html'
+    model = Employee
+    fields = '__all__'
+
+    def get(self, *args, **kwargs):
+        return super().get(*args, **kwargs)
+
 
 # def my_view(request):
 #     handler = None
@@ -56,6 +92,7 @@ class IndexViewWithListView(views.ListView):
 #     else:
 #         handler = self.post
 #     return handler
+
 
 # class IndexView:
 #     # The __init__ method is the Python equivalent of the C++ constructor in an object-oriented approach.

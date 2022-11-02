@@ -7,9 +7,26 @@
 <body>
 <h1>{{ title }}</h1>
 From CBV
-
+<form method="GET" action="{% url 'index' %}">
+    <label>
+        <input name = "pattern" placeholder="Enter text"/>
+    </label>
+    <button>Search</button>
+    {% csrf_token %}
+    <a href="{% url 'employee create' %}">Create new employee</a>
+</form>
 {% for employee in employees %}
     <li>{{ employee.full_name }}</li>
 {% endfor %}
+<ul>
+{% for employee in employees %}
+    <li>
+    <a href="{% url 'employee details' %} pk=employee.pk">
+        {{ employee.full_name }}
+    </a>
+
+    </li>
+{% endfor %}
+</ul>
 </body>
 </html>
