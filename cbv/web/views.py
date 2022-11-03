@@ -1,7 +1,8 @@
 import random
-from django import views
+from django import views, forms
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
 from django.views import generic as views
 
 from cbv.web.models import Employee
@@ -76,14 +77,54 @@ class EmployeeDetailsView(views.DetailView):
     template_name = 'employees/details.html'
 
 
+class EmployeeCreateForm(forms.Modelform):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+        widgets = {
+            'first_name': forms.TextInput(
+                attrs={
+                    'placeholder': 'Enter name',
+                }
+            )
+        }
+
+
 class EmployeeCreateView(views.CreateView):
     template_name = 'employees/create.html'
     model = Employee
     fields = '__all__'
+    # static 'success_url':
+    # success_url = '/'
+
+
+
+    # Dynamic url option
+    def get_success_url(self):
+        return reverse_lazy('employee details', kwargs={
+            'pk': self.object.pk,
+        })
+
+   #  Replace automatic form
+   # form_class = EmployeeCreateForm
 
     def get(self, *args, **kwargs):
         return super().get(*args, **kwargs)
 
+    def post(self, *args, **kwargs):
+        return super().post(*args, **kwargs)
+
+    # Change the automatic form
+    # def get_form(self, form_class = None):
+    #     form = super().get_form(form_class=form_class)
+    #     for name, field in form.fields.items():
+    #         field.widget.attrs['placeholder'] = 'Enter ' + name
+    #
+    #     return form
+
+
+class EmployeeUpdateView(views.UpdateView):
+    model = Employee
 
 # def my_view(request):
 #     handler = None
